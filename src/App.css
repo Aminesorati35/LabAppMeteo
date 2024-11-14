@@ -1,0 +1,86 @@
+/* Center the app with a subtle gradient background */
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #85C1E9, #2E86C1);
+  font-family: Arial, sans-serif;
+  color: #333;
+  padding: 20px;
+}
+
+/* Style the app title */
+.app-name {
+  font-size: 2rem;
+  color: #fff;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Style the search bar */
+.search-bar {
+  margin-bottom: 20px;
+}
+
+.city-search {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px;
+  border-radius: 20px;
+  border: none;
+  font-size: 1rem;
+  text-align: center;
+  outline: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Add loading spinner style */
+.react-loader-spinner {
+  margin: 20px;
+}
+
+/* Style the error message */
+.error-message {
+  color: #ff4f4f;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.error-message svg {
+  margin-right: 8px;
+}
+
+/* Style weather information display */
+.weather-data {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+}
+
+.weather-data h2 {
+  font-size: 1.5rem;
+  color: #2E86C1;
+}
+
+.weather-data span {
+  font-size: 1rem;
+  color: #666;
+}
+
+.weather-data img {
+  width: 100px;
+  height: 100px;
+  margin-top: 10px;
+}
+
+.weather-data p {
+  font-size: 1.2rem;
+  color: #333;
+}
