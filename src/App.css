@@ -84,3 +84,17 @@
   font-size: 1.2rem;
   color: #333;
 }
+.forecast {
+  margin-top: 20px;
+}
+.forecast-cards {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+}
+.forecast-card {
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  text-align: center;
+}
