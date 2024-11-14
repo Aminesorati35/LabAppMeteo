@@ -1,8 +1,8 @@
 import { Oval } from 'react-loader-spinner';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFrown } from '@fortawesome/free-solid-svg-icons';
+import { faFrown, faStar } from '@fortawesome/free-solid-svg-icons';
 import './App.css';
 
 function Grp204WeatherApp() {
@@ -13,6 +13,13 @@ function Grp204WeatherApp() {
     error: false,
   });
   const [forecast, setForecast] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+
+  // Retrieve favorite cities from localStorage on component mount
+  useEffect(() => {
+    const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    setFavorites(savedFavorites);
+  }, []);
 
   const toDateFunction = () => {
     const months = [
@@ -67,6 +74,35 @@ function Grp204WeatherApp() {
     }
   };
 
+  // Save city to favorites
+  const addToFavorites = () => {
+    if (weather.data && !favorites.some(fav => fav.name === weather.data.name)) {
+      const updatedFavorites = [...favorites, weather.data];
+      setFavorites(updatedFavorites);
+      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+    }
+  };
+
+  // Handle click on a favorite city
+  const handleFavoriteClick = (city) => {
+    setWeather({ data: city, loading: false, error: false });
+    setInput(city.name);
+    // Fetch the forecast for the clicked city
+    const apiKey = 'f00c38e0279b7bc85480c3fe775d518c';
+    axios.get('https://api.openweathermap.org/data/2.5/forecast', {
+      params: {
+        q: city.name,
+        units: 'metric',
+        appid: apiKey,
+      },
+    }).then((response) => {
+      const dailyForecast = response.data.list.filter((reading) =>
+        reading.dt_txt.includes("12:00:00")
+      ).slice(0, 5);
+      setForecast(dailyForecast);
+    });
+  };
+
   return (
     <div className="App">
       <h1 className="app-name">Application Météo grp204</h1>
@@ -79,6 +115,9 @@ function Grp204WeatherApp() {
           onChange={(event) => setInput(event.target.value)}
           onKeyPress={search}
         />
+        <button className="add-favorite" onClick={addToFavorites}>
+          <FontAwesomeIcon icon={faStar} />
+        </button>
       </div>
 
       {weather.loading && (
@@ -90,7 +129,9 @@ function Grp204WeatherApp() {
           <span>Ville introuvable</span>
         </span>
       )}
-      {weather.data.main && (
+
+      {/* Current Weather Section */}
+      {weather.data && weather.data.name && weather.data.sys && (
         <div>
           <h2>{weather.data.name}, {weather.data.sys.country}</h2>
           <span>{toDateFunction()}</span>
@@ -118,6 +159,24 @@ function Grp204WeatherApp() {
                   alt={day.weather[0].description}
                 />
                 <p>{Math.round(day.main.temp)}°C</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Favorite Cities Section */}
+      {favorites.length > 0 && (
+        <div className="favorites">
+          <h3>Villes favorites</h3>
+          <div className="favorites-container">
+            {favorites.map((fav) => (
+              <div
+                key={fav.name}
+                className="favorite-city"
+                onClick={() => handleFavoriteClick(fav)}
+              >
+                {fav.name}, {fav.sys ? fav.sys.country : 'Non disponible'}
               </div>
             ))}
           </div>
