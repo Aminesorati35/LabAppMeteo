@@ -1,4 +1,4 @@
-import { Oval } from 'react-loader-spinner';
+import { Circles } from 'react-loader-spinner';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,12 +14,51 @@ function Grp204WeatherApp() {
   });
   const [forecast, setForecast] = useState([]);
   const [favorites, setFavorites] = useState([]);
+  const [theme, setTheme] = useState('light'); // For day/night mode
 
   // Retrieve favorite cities from localStorage on component mount
   useEffect(() => {
     const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
     setFavorites(savedFavorites);
+
+    // Detect user location on mount
+    detectUserLocation();
   }, []);
+
+  // Automatically detect the user's location
+  const detectUserLocation = async () => {
+    const apiKey = 'f00c38e0279b7bc85480c3fe775d518c';
+
+    try {
+      const position = await new Promise((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, reject)
+      );
+
+      const { latitude, longitude } = position.coords;
+
+      // Fetch weather data for user's location
+      const response = await axios.get('https://api.openweathermap.org/data/2.5/weather', {
+        params: {
+          lat: latitude,
+          lon: longitude,
+          units: 'metric',
+          appid: apiKey,
+        },
+      });
+
+      setWeather({ data: response.data, loading: false, error: false });
+      setThemeBasedOnTime(response.data); // Set the theme
+    } catch (error) {
+      console.error('Error detecting location:', error);
+    }
+  };
+
+  // Set the theme based on local time
+  const setThemeBasedOnTime = (weatherData) => {
+    const currentTime = new Date().getHours();
+    const isNight = currentTime >= 18 || currentTime < 6; // Define night hours
+    setTheme(isNight ? 'dark' : 'light');
+  };
 
   const toDateFunction = () => {
     const months = [
@@ -51,6 +90,7 @@ function Grp204WeatherApp() {
           },
         });
         setWeather({ data: weatherResponse.data, loading: false, error: false });
+        setThemeBasedOnTime(weatherResponse.data); // Update the theme
 
         // Fetch forecast data
         const forecastResponse = await axios.get('https://api.openweathermap.org/data/2.5/forecast', {
@@ -104,7 +144,7 @@ function Grp204WeatherApp() {
   };
 
   return (
-    <div className="App">
+    <div className={`App ${theme}`}>
       <h1 className="app-name">Application Météo grp204</h1>
       <div className="search-bar">
         <input
@@ -121,7 +161,12 @@ function Grp204WeatherApp() {
       </div>
 
       {weather.loading && (
-        <Oval type="Oval" color="black" height={100} width={100} />
+        <Circles
+        color="red"
+        height={100}
+        width={100}
+        ariaLabel="loading"
+      />
       )}
       {weather.error && (
         <span className="error-message">
